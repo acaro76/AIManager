@@ -1,0 +1,22 @@
+.env
+.DS_Store
+
+# File di runtime: dati che cambiano di continuo, fuori dai commit di codice (regola sez. 40.0)
+storage/logs/
+storage/cache/
+storage/attachments/
+storage/memory/
+storage/cancellations/
+storage/backups/
+storage/code_patches/
+storage/code_commands/
+storage/code_runtime/
+storage/database/*.sqlite
+storage/database/*.sqlite-wal
+storage/database/*.sqlite-shm
+
+# Impostazioni locali dell'ambiente (non condivise)
+.claude/settings.local.json
+
+# Artefatti di rilascio (Fase 10 / Step 4): prodotti localmente, mai versionati
+dist/

@@ -1,0 +1,10 @@
+{
+  "name": "Hello AI",
+  "slug": "hello-ai",
+  "version": "1.0.0",
+  "description": "Aggiunge un widget dimostrativo alla dashboard.",
+  "enabled": true,
+  "hooks": {
+    "dashboard.widgets": "widgets.php"
+  }
+}
