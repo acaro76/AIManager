@@ -65,3 +65,7 @@ Prima di proporre modifiche leggi [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Licenza
 
 AIManager è distribuito con licenza [Apache License 2.0](LICENSE).
+
+---
+
+Sviluppato da [Gennari Productions](https://gennari.es) — [Alessandro Gennari](https://gennari.es/alessandro-gennari.html), AI Consultant, Las Palmas de Gran Canaria.
