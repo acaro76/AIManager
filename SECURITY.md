@@ -7,9 +7,9 @@ non si aggiornano automaticamente.
 
 ## Segnalare una vulnerabilità
 
-Non aprire un issue pubblico con credenziali, dati personali o istruzioni di exploit. Dopo
-l'apertura del repository usa **GitHub Security Advisories → Report a vulnerability**. Finché il
-repository pubblico non esiste, segnala il problema privatamente al proprietario del progetto.
+Non aprire un issue pubblico con credenziali, dati personali o istruzioni di exploit. Usa la scheda
+**Security** del repository → **Report a vulnerability**. Se l'opzione non è disponibile, segnala il
+problema privatamente al proprietario del progetto.
 
 Indica versione o commit, impatto, prerequisiti e una riproduzione minima priva di dati reali. Non
 allegare `.env`, database, conversazioni, log completi o contenuti di workspace.
