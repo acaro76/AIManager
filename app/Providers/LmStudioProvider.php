@@ -5,12 +5,26 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Core\ContextEngine\ContextInterface;
+use App\Core\Providers\LmStudioCatalog;
 use App\Core\Providers\LmStudioModelChoice;
 use App\Core\Providers\ProviderIntent;
 use App\Services\AIProviderResult;
 
 final class LmStudioProvider extends AbstractProvider
 {
+    /** @var array<string, LmStudioCatalog|null> una lettura per endpoint, per richiesta */
+    private array $catalogCache = [];
+
+    /** @var callable|null lettore dell'API nativa, iniettabile nei test */
+    private $catalogFetcher = null;
+
+    /** Sostituisce il lettore dell'API nativa (solo per i test: nessuna rete). */
+    public function setCatalogFetcher(?callable $fetcher): void
+    {
+        $this->catalogFetcher = $fetcher;
+        $this->catalogCache = [];
+    }
+
     public function key(): string
     {
         return 'lmstudio';
@@ -114,6 +128,12 @@ final class LmStudioProvider extends AbstractProvider
     {
         $baseUrl = rtrim((string) ($config['base_url'] ?? $this->baseUrl()), '/');
         $model = $this->resolveModel($config);
+        if ($model === '') {
+            // Nessun nome risolvibile: meglio un errore chiaro qui che il generico
+            // "No models loaded" restituito da LM Studio a fronte di un modello vuoto.
+            return AIProviderResult::failure($this->missingModelMessage($config), [],
+                $this->resultMeta($config));
+        }
         $payload = $this->createRequest($prompt, $context);
         $payload['model'] = $model;
         $payload['messages'] = $this->buildMessages($prompt, $context, $config);
@@ -160,17 +180,71 @@ final class LmStudioProvider extends AbstractProvider
      *  - pesante -> modello ragionante (qwen) per lavori lunghi/complessi non-codice.
      *  - breve   -> modello veloce non-ragionante.
      */
-    private function resolveModel(array $config): string
+    public function resolveModel(array $config): string
     {
         $intent = $config['_intent'] ?? null;
 
-        return LmStudioModelChoice::resolve(
+        $configured = LmStudioModelChoice::resolve(
             (string) ($config['model'] ?? $this->defaultModel()),
             (string) ($config['fast_model'] ?? ''),
             (string) ($config['code_model'] ?? ''),
             (string) ($config['vision_model'] ?? ''),
             $intent instanceof ProviderIntent ? $intent : null,
         );
+
+        $visionRequired = $this->hasImageAttachments($config)
+            || ($intent instanceof ProviderIntent && $intent->requiresVision);
+
+        $catalog = $this->catalog($config);
+        if ($catalog === null) {
+            return $configured;                  // API non raggiungibile: si resta com'era
+        }
+
+        // Il modello configurato per questo ruolo esiste ancora ed e' adatto: si tiene.
+        if ($catalog->has($configured, $visionRequired)) {
+            return $configured;
+        }
+
+        // Configurazione vuota o modello non piu' disponibile: si risolve adesso, senza
+        // scrivere nulla nella configurazione.
+        return $catalog->choose($visionRequired);
+    }
+
+    /**
+     * Catalogo dei modelli locali, letto una sola volta per richiesta e per endpoint.
+     */
+    private function catalog(array $config): ?LmStudioCatalog
+    {
+        $baseUrl = rtrim((string) ($config['base_url'] ?? $this->baseUrl()), '/');
+        if (array_key_exists($baseUrl, $this->catalogCache)) {
+            return $this->catalogCache[$baseUrl];
+        }
+
+        $catalog = LmStudioCatalog::fetch(
+            $baseUrl,
+            (int) ($config['timeout_seconds'] ?? 5),
+            $this->catalogFetcher
+        );
+        $this->catalogCache[$baseUrl] = $catalog;
+
+        return $catalog;
+    }
+
+    private function missingModelMessage(array $config): string
+    {
+        $intent = $config['_intent'] ?? null;
+        $visionRequired = $this->hasImageAttachments($config)
+            || ($intent instanceof ProviderIntent && $intent->requiresVision);
+
+        $catalog = $this->catalog($config);
+        if ($catalog === null) {
+            return 'LM Studio non raggiungibile: impossibile determinare il modello da usare.';
+        }
+        if ($visionRequired) {
+            return 'Nessun modello LM Studio con supporto immagini disponibile.';
+        }
+
+        return 'Nessun modello linguistico disponibile in LM Studio.';
     }
 
     private function buildMessages(string $prompt, ContextInterface $context, array $config): array
