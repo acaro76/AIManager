@@ -2,70 +2,85 @@
 
 # AIManager
 
-AIManager is a local AI hub for macOS that brings together chat, projects, memory, multiple
-providers and a controlled Code environment. Application data stays on your machine; when you pick a
-cloud provider, the requests and attachments it needs are sent to that service under its own terms.
+**AIManager lets you work with multiple artificial intelligence systems from one place:
+models running on your Mac and free or paid external services.**
 
-The project has passed the technical gate of its first release and is usable locally. The current
-distribution is a manual macOS archive: it is not an `.app`, and it includes no installer, signing,
-notarization or automatic updates.
-
-## Available features
-
-- streaming chat with routing and fallback across providers;
-- projects, sessions, memory and context continuity;
-- optional web search, attachments and image generation;
-- credential setup and testing from the Provider UI;
-- Code on an authorized folder, with targeted reads, change proposals, curated verifications,
-  read-only commands, a local PHP server and assisted Git up to the local commit.
-
-Code is not an operating-system sandbox. Modifying operations require confirmation, and there is
-neither a general shell nor an implicit Git push.
+It keeps conversations, projects, documents, instructions, context and memory locally.
+You can continue the same work with a different AI without starting over or depending on
+one provider. AIManager can choose the most suitable AI and use another one when the
+first is unavailable.
 
 ## Requirements
 
-- macOS, local single-user use;
+- macOS, for local single-user use;
 - PHP 8.5 with SQLite, cURL and mbstring;
-- `pcntl` and `posix` for Code commands and persistent processes;
-- at least one AI provider: your own cloud key, or LM Studio installed separately.
+- Git;
+- at least one provider: your personal key for an external service, or
+  [LM Studio](https://lmstudio.ai/download) for local models.
 
-## Quick start
+**Code** also requires the PHP extensions `pcntl` and `posix`. External services do not
+require a local model. For LM Studio, memory and storage requirements depend on the model;
+a Mac mini M2 Pro with 16 GB of unified memory is a practical reference configuration for
+smaller local models.
+
+## Download
 
 ```bash
-cp .env.example .env
-bin/launch.sh
+git clone https://github.com/acaro76/AIManager.git
+cd AIManager
 ```
 
-AIManager opens at `http://127.0.0.1:8000`. On first launch:
+## Install
 
-1. go to **Provider**;
-2. choose LM Studio or a cloud provider;
-3. enter endpoint, model and, if required, your key;
-4. enable the provider, run **Test**, then **Save**;
-5. open **Nuova chat** (New chat).
+```bash
+bash bin/install.sh
+```
 
-You do not need to fill keys into `.env` by hand: the Provider UI stores them locally. See the
-[Provider guide](docs/PROVIDERS.md) and the [user guide](docs/USER_GUIDE.md) for the full path.
-Installation, update and rollback are described in [RELEASE.md](docs/RELEASE.md).
+The command checks the requirements and prepares the local configuration without asking
+for or displaying API keys.
 
-> The application interface and the detailed guides under `docs/` are currently Italian only.
-> Localization of the product is a post-launch direction, not a promise for this release.
+## Launch
 
-## Data and privacy
+```bash
+bash bin/launch.sh
+```
 
-- `.env` holds your credentials and stays local;
-- `storage/` holds the database, conversations, memories, attachments, logs and backups;
+AIManager opens in your browser at <http://127.0.0.1:8000>.
+
+## First use
+
+1. Open **Provider**.
+2. Choose LM Studio or an external service.
+3. Enter your key only when the service requires one.
+4. Enable the provider, run **Test**, then press **Save**.
+5. Open **New chat**.
+
+AIManager automatically discovers the models available in LM Studio. Credentials are
+configured from the interface and remain in the local configuration.
+
+## What you can do
+
+- progressive conversations with routing and automatic fallback between providers;
+- projects, sessions, memory and context continuity;
+- optional web search, attachments and image generation;
+- provider configuration and verification from the interface;
+- assisted work on authorized folders with **Code**, including targeted reads, change
+  proposals, controlled checks and local Git.
+
+**Code is not an operating-system security boundary.** Operations that modify files
+require confirmation; there is no general shell and no implicit Git push.
+
+## Data and control
+
+- `.env` contains credentials and stays local;
+- `storage/` contains the database, conversations, memories, attachments, logs and
+  backups;
 - folders opened in Code remain outside AIManager;
-- `.env`, runtime data, backups and workspaces must never enter a commit or a release.
+- `.env`, runtime data, backups and workspaces must not be published to the repository.
 
-For boundaries and responsible reporting see [SECURITY.md](SECURITY.md).
-
-## Status and contributions
-
-The priority is making the first-run experience reliable and validating it with outside users, not
-adding features indiscriminately. See the [public roadmap](docs/PUBLIC_ROADMAP.md).
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing changes.
+See the [provider guide](docs/PROVIDERS.md), [user guide](docs/USER_GUIDE.md), and
+[update and rollback instructions](docs/RELEASE.md). For security boundaries, see
+[SECURITY.md](SECURITY.md).
 
 ## License
 
@@ -73,4 +88,6 @@ AIManager is distributed under the [Apache License 2.0](LICENSE).
 
 ---
 
-Developed by [Gennari Productions](https://gennari.es/) — [Alessandro Gennari](https://gennari.es/alessandro-gennari.html), AI Consultant, Las Palmas de Gran Canaria.
+Developed by [Gennari Productions](https://gennari.es/) —
+[Alessandro Gennari](https://gennari.es/alessandro-gennari.html), AI Consultant,
+Las Palmas de Gran Canaria.

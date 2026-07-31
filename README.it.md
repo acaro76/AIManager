@@ -2,67 +2,90 @@
 
 # AIManager
 
-AIManager è un centro AI locale per macOS che riunisce chat, progetti, memoria, provider multipli e
-un ambiente Code controllato. I dati applicativi restano sulla macchina; quando scegli un provider
-cloud, richieste e allegati necessari vengono inviati a quel servizio secondo le sue condizioni.
+**AIManager permette di lavorare con molteplici intelligenze artificiali da un unico
+ambiente: modelli residenti sul proprio computer e servizi esterni gratuiti o a
+pagamento.**
 
-Il progetto ha superato il gate tecnico della prima release ed è usabile localmente. La distribuzione
-attuale è un archivio manuale per macOS: non è una `.app`, non include installer, firma,
-notarizzazione o aggiornamento automatico.
-
-## Funzioni disponibili
-
-- chat in streaming con routing e fallback fra provider;
-- progetti, sessioni, memoria e continuità del contesto;
-- ricerca web, allegati e generazione immagini opzionali;
-- configurazione e test delle credenziali dalla UI Provider;
-- Code su una cartella autorizzata, con letture mirate, proposte di modifica, verifiche curate,
-  comandi di sola lettura, server PHP locale e Git assistito fino al commit locale.
-
-Code non è una sandbox del sistema operativo. Le operazioni modificanti richiedono conferma e non
-esiste una shell generale né un push Git implicito.
+Conserva localmente conversazioni, progetti, documenti, istruzioni, contesto e memoria.
+Puoi continuare lo stesso lavoro passando da un'intelligenza artificiale all'altra,
+senza ricominciare da zero e senza dipendere da un solo fornitore. AIManager può scegliere
+l'intelligenza artificiale più adatta e usarne un'altra quando la principale non è
+disponibile.
 
 ## Requisiti
 
-- macOS, uso locale e singolo utente;
+- macOS, per uso locale e singolo utente;
 - PHP 8.5 con SQLite, cURL e mbstring;
-- `pcntl` e `posix` per comandi Code e processi persistenti;
-- almeno un provider AI: una chiave cloud personale oppure LM Studio installato separatamente.
+- Git;
+- almeno un fornitore: una chiave personale per un servizio esterno oppure
+  [LM Studio](https://lmstudio.ai/download) per usare modelli locali.
 
-## Avvio rapido
+Le funzioni **Code** richiedono anche le estensioni PHP `pcntl` e `posix`. Con i servizi
+esterni non serve un modello locale. Per LM Studio, memoria e spazio necessari dipendono
+dal modello scelto; un Mac mini M2 Pro con 16 GB di memoria unificata è una configurazione
+di riferimento pratica per modelli locali di dimensioni contenute.
+
+## Scaricamento
 
 ```bash
-cp .env.example .env
-bin/launch.sh
+git clone https://github.com/acaro76/AIManager.git
+cd AIManager
 ```
 
-AIManager si apre su `http://127.0.0.1:8000`. Alla prima apertura:
+## Installazione
 
-1. entra in **Provider**;
-2. scegli LM Studio oppure un provider cloud;
-3. inserisci endpoint, modello e, se richiesta, la tua chiave;
-4. attiva il provider, esegui **Test** e poi **Salva**;
-5. apri **Nuova chat**.
+```bash
+bash bin/install.sh
+```
 
-Non è necessario compilare manualmente le chiavi in `.env`: la UI Provider le salva localmente.
-Consulta [la guida Provider](docs/PROVIDERS.md) e [la guida utente](docs/USER_GUIDE.md) per il percorso
-completo. Installazione, aggiornamento e rollback sono descritti in [RELEASE.md](docs/RELEASE.md).
+Il comando verifica i requisiti e prepara la configurazione locale senza chiedere né
+mostrare chiavi.
 
-## Dati e privacy
+## Avvio
 
-- `.env` contiene le credenziali ed è locale;
-- `storage/` contiene database, conversazioni, memorie, allegati, log e backup;
+```bash
+bash bin/launch.sh
+```
+
+AIManager si apre nel browser all'indirizzo <http://127.0.0.1:8000>.
+
+## Primo utilizzo
+
+1. Apri **Fornitori**.
+2. Scegli LM Studio oppure un servizio esterno.
+3. Inserisci la tua chiave soltanto se il servizio la richiede.
+4. Attiva il fornitore, esegui **Test** e premi **Salva**.
+5. Apri **Nuova chat**.
+
+AIManager rileva automaticamente i modelli disponibili in LM Studio. Le credenziali si
+configurano dall'interfaccia e restano nella configurazione locale.
+
+## Cosa puoi fare
+
+- conversazioni progressive con instradamento e alternativa automatica tra fornitori;
+- progetti, sessioni, memoria e continuità del contesto;
+- ricerca web, allegati e generazione di immagini;
+- configurazione e verifica dei fornitori dall'interfaccia;
+- lavoro assistito su cartelle autorizzate con **Code**, incluse letture mirate, proposte
+  di modifica, verifiche controllate e Git locale.
+
+**Code non è una barriera di sicurezza del sistema operativo.** Le operazioni che
+modificano file richiedono conferma; non esistono una riga di comando generale né una
+pubblicazione Git implicita.
+
+## Dati e controllo
+
+- `.env` contiene le credenziali e resta locale;
+- `storage/` contiene banca dati, conversazioni, memorie, allegati, registri e copie di
+  sicurezza;
 - le cartelle aperte in Code restano esterne ad AIManager;
-- `.env`, dati runtime, backup e workspace non devono entrare in commit o release.
+- `.env`, dati di esecuzione, copie di sicurezza e cartelle di lavoro non devono essere
+  pubblicati nel deposito.
 
-Per i confini e la segnalazione responsabile dei problemi consulta [SECURITY.md](SECURITY.md).
-
-## Stato e contributi
-
-La priorità è rendere affidabile il primo utilizzo e validarlo con utenti esterni, non aggiungere
-funzioni indiscriminatamente. Vedi la [roadmap pubblica](docs/PUBLIC_ROADMAP.md).
-
-Prima di proporre modifiche leggi [CONTRIBUTING.md](CONTRIBUTING.md).
+Consulta la [guida dei fornitori](docs/PROVIDERS.md), la
+[guida utente](docs/USER_GUIDE.md) e le istruzioni per
+[aggiornamento e ripristino](docs/RELEASE.md). Per i confini di sicurezza consulta
+[SECURITY.md](SECURITY.md).
 
 ## Licenza
 
@@ -70,4 +93,6 @@ AIManager è distribuito con licenza [Apache License 2.0](LICENSE).
 
 ---
 
-Sviluppato da [Gennari Productions](https://gennari.es/) — [Alessandro Gennari](https://gennari.es/alessandro-gennari.html), AI Consultant, Las Palmas de Gran Canaria.
+Sviluppato da [Gennari Productions](https://gennari.es/) —
+[Alessandro Gennari](https://gennari.es/alessandro-gennari.html), consulente AI,
+Las Palmas de Gran Canaria.
